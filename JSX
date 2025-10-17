@@ -1,0 +1,538 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { ShoppingCart, Search, Star, Heart, Menu, X, Truck, Leaf, Award, User, Lock, CreditCard, Eye, EyeOff, Plus, Edit, Trash2, Upload, QrCode, Clock, Package, MapPin, CheckCircle, AlertCircle, Send, Phone, Map, DollarSign } from 'lucide-react';
+
+const App = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('ទាំងអស់');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [registerName, setRegisterName] = useState('');
+  const [registerEmail, setRegisterEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
+  const [registerConfirmPassword, setRegisterConfirmPassword] = useState('');
+  const [orders, setOrders] = useState([]);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [editingFruit, setEditingFruit] = useState(null);
+  const [newFruit, setNewFruit] = useState({
+    name: '',
+    price: '',
+    originalPrice: '',
+    category: 'គ្រឿងតុបតែង',
+    description: '',
+    weight: ''
+  });
+  const fileInputRef = useRef(null);
+  const [adminQrCode, setAdminQrCode] = useState('https://via.placeholder.com/300x300/000000/ffffff?text=QR+Code');
+  const [showQrPayment, setShowQrPayment] = useState(false);
+  const [qrAmount, setQrAmount] = useState(0);
+  
+  // New states for customer info
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerLocation, setCustomerLocation] = useState('');
+  const [showOrderTracking, setShowOrderTracking] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null);
+
+  // Constants
+  const SHIPPING_FEE = 2.00;
+
+  // Sample product data with reliable image URLs
+  const [fruits, setFruits] = useState([
+    {
+      id: 1,
+      name: 'កាក់តុបតែង',
+      price: 12.99,
+      originalPrice: 15.99,
+      image: 'https://via.placeholder.com/300x300/ff6b81/ffffff?text=កាក់តុបតែង',
+      category: 'គ្រឿងតុបតែង',
+      rating: 4.8,
+      reviews: 42,
+      description: 'កាក់តុបតែងសម្រាប់ស្ត្រី គុណភាពខ្ពស់',
+      weight: '1 គ្រឿង'
+    },
+    {
+      id: 2,
+      name: 'ទូរសព្ទដៃ',
+      price: 299.99,
+      originalPrice: 349.99,
+      image: 'https://via.placeholder.com/300x300/4ecdc4/ffffff?text=ទូរសព្ទដៃ',
+      category: 'គ្រឿងអេឡិចត្រូនិច',
+      rating: 4.6,
+      reviews: 89,
+      description: 'ទូរសព្ទដៃស្មាតហ្វូន អេក្រង់ធំ',
+      weight: '1 គ្រឿង'
+    },
+    {
+      id: 3,
+      name: 'តុឈើ',
+      price: 89.99,
+      originalPrice: 120.00,
+      image: 'https://via.placeholder.com/300x300/ff6b6b/ffffff?text=តុឈើ',
+      category: 'គ្រឿងសង្ហារឹម',
+      rating: 4.9,
+      reviews: 23,
+      description: 'តុឈើសម្រាប់ការិយាល័យ ធ្វើពីឈើធម្មជាតិ',
+      weight: '10kg'
+    },
+    {
+      id: 4,
+      name: 'កាហ្វេ',
+      price: 8.99,
+      originalPrice: 10.99,
+      image: 'https://via.placeholder.com/300x300/ffd93d/ffffff?text=កាហ្វេ',
+      category: 'គ្រឿងបរិភោគ',
+      rating: 4.7,
+      reviews: 156,
+      description: 'កាហ្វេអារ៉ាបីកា គុណភាពខ្ពស់',
+      weight: '500g'
+    }
+  ]);
+
+  const categories = [
+    { id: 'ទាំងអស់', name: 'ផលិតផលទាំងអស់' },
+    { id: 'គ្រឿងតុបតែង', name: 'គ្រឿងតុបតែង' },
+    { id: 'គ្រឿងអេឡិចត្រូនិច', name: 'គ្រឿងអេឡិចត្រូនិច' },
+    { id: 'គ្រឿងសង្ហារឹម', name: 'គ្រឿងសង្ហារឹម' },
+    { id: 'គ្រឿងបរិភោគ', name: 'គ្រឿងបរិភោគ' }
+  ];
+
+  const orderStatuses = [
+    { id: 'pending', name: 'កំពុងពិនិត្យ', icon: Clock, color: 'text-yellow-600' },
+    { id: 'processing', name: 'កំពុងរៀបចំឥវ៉ាន់', icon: Package, color: 'text-blue-600' },
+    { id: 'shipping', name: 'កំពុងដឹក', icon: Truck, color: 'text-purple-600' },
+    { id: 'delivered', name: 'ដល់ទីកន្លែង', icon: MapPin, color: 'text-green-600' },
+    { id: 'completed', name: 'បានឥវ៉ាន់', icon: CheckCircle, color: 'text-green-700' }
+  ];
+
+  const filteredFruits = fruits.filter(fruit => {
+    const matchesSearch = fruit.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'ទាំងអស់' || fruit.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const addToCart = (fruit) => {
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => item.id === fruit.id);
+      if (existingItem) {
+        return prevItems.map(item =>
+          item.id === fruit.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prevItems, { ...fruit, quantity: 1 }];
+    });
+  };
+
+  const removeFromCart = (id) => {
+    setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+  };
+
+  const updateQuantity = (id, quantity) => {
+    if (quantity === 0) {
+      removeFromCart(id);
+      return;
+    }
+    setCartItems(prevItems =>
+      prevItems.map(item => item.id === id ? { ...item, quantity } : item)
+    );
+  };
+
+  const getSubtotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  const getTotalPrice = () => {
+    return getSubtotal() + SHIPPING_FEE;
+  };
+
+  const getTotalItems = () => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (loginEmail === 'gheng6056@gmail.com' && loginPassword === '121212') {
+      setIsAdmin(true);
+      setCurrentUser({ email: loginEmail, isAdmin: true, name: 'Admin' });
+      setShowLoginModal(false);
+      setLoginEmail('');
+      setLoginPassword('');
+    } else {
+      // Mock regular user login
+      const mockUser = { email: loginEmail, name: loginEmail.split('@')[0], isAdmin: false };
+      setCurrentUser(mockUser);
+      setShowLoginModal(false);
+      setLoginEmail('');
+      setLoginPassword('');
+    }
+  };
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    if (registerPassword !== registerConfirmPassword) {
+      alert('លេខសម្ងាត់មិនដូចគ្នា!');
+      return;
+    }
+    // Mock user registration
+    const newUser = { email: registerEmail, name: registerName, isAdmin: false };
+    setCurrentUser(newUser);
+    setShowRegisterModal(false);
+    setRegisterName('');
+    setRegisterEmail('');
+    setRegisterPassword('');
+    setRegisterConfirmPassword('');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setIsAdmin(false);
+  };
+
+  const handlePayment = () => {
+    if (!customerPhone || !customerLocation) {
+      alert('សូមបញ្ចូលលេខទូរសព្ទ និងទីតាំងរបស់អ្នក!');
+      return;
+    }
+    
+    const newOrder = {
+      id: Date.now(),
+      items: cartItems,
+      subtotal: getSubtotal(),
+      shippingFee: SHIPPING_FEE,
+      total: getTotalPrice(),
+      status: 'pending',
+      date: new Date().toLocaleDateString('km-KH'),
+      paymentMethod: 'qr',
+      customerPhone,
+      customerLocation,
+      customerName: currentUser?.name || 'អតិថិជន'
+    };
+    
+    setOrders(prev => [...prev, newOrder]);
+    setCartItems([]);
+    setShowPaymentModal(false);
+    setShowQrPayment(true);
+    setQrAmount(getTotalPrice());
+    setCustomerPhone('');
+    setCustomerLocation('');
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (editingFruit) {
+          setEditingFruit({ ...editingFruit, image: event.target.result });
+        } else if (isAdmin && showAdminPanel) {
+          // Admin is uploading QR code
+          setAdminQrCode(event.target.result);
+        } else {
+          setNewFruit({ ...newFruit, image: event.target.result });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const saveFruit = () => {
+    if (!newFruit.name || !newFruit.price || !newFruit.category) {
+      alert('សូមបំពេញព័ត៌មានផលិតផលឱ្យបានគ្រប់!');
+      return;
+    }
+    
+    if (editingFruit) {
+      // Update existing fruit
+      setFruits(fruits.map(fruit => 
+        fruit.id === editingFruit.id ? { ...editingFruit } : fruit
+      ));
+      setEditingFruit(null);
+      // Reset form
+      setNewFruit({
+        name: '',
+        price: '',
+        originalPrice: '',
+        category: 'គ្រឿងតុបតែង',
+        description: '',
+        weight: ''
+      });
+    } else {
+      // Add new fruit
+      const fruitToAdd = {
+        ...newFruit,
+        id: Date.now(),
+        price: parseFloat(newFruit.price),
+        originalPrice: newFruit.originalPrice ? parseFloat(newFruit.originalPrice) : parseFloat(newFruit.price),
+        rating: 4.5,
+        reviews: 0,
+        image: newFruit.image || 'https://via.placeholder.com/300x300/cccccc/ffffff?text=ផលិតផល'
+      };
+      setFruits([...fruits, fruitToAdd]);
+      setNewFruit({
+        name: '',
+        price: '',
+        originalPrice: '',
+        category: 'គ្រឿងតុបតែង',
+        description: '',
+        weight: ''
+      });
+    }
+  };
+
+  const deleteFruit = (id) => {
+    setFruits(fruits.filter(fruit => fruit.id !== id));
+  };
+
+  const updateOrderStatus = (orderId, newStatus) => {
+    setOrders(orders.map(order => 
+      order.id === orderId ? { ...order, status: newStatus } : order
+    ));
+    if (editingOrder?.id === orderId) {
+      setEditingOrder({ ...editingOrder, status: newStatus });
+    }
+  };
+
+  const viewOrderDetails = (order) => {
+    setSelectedOrder(order);
+    setShowOrderTracking(true);
+  };
+
+  const completePayment = () => {
+    setShowQrPayment(false);
+    alert('ការទូទាត់បានជោគជ័យ! យើងនឹងដំណើរការការកុម្ម៉ង់របស់អ្នកភ្លាមៗ។');
+  };
+
+  const getStatusInfo = (statusId) => {
+    return orderStatuses.find(status => status.id === statusId) || orderStatuses[0];
+  };
+
+  // Function to start editing a fruit
+  const startEditingFruit = (fruit) => {
+    setEditingFruit({...fruit});
+    setNewFruit({...fruit});
+    setShowAdminPanel(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+      {/* Header */}
+      <header className="bg-white shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center space-x-2">
+              <Leaf className="h-8 w-8 text-green-600" />
+              <span className="text-2xl font-bold text-green-800">LH Accessories</span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#" className="text-green-800 hover:text-green-600 font-medium">ទំព័រដើម</a>
+              <a href="#" className="text-gray-600 hover:text-green-600 font-medium">ទិញឥវ៉ាន់</a>
+              <button
+                onClick={() => setShowOrderTracking(true)}
+                className="text-gray-600 hover:text-green-600 font-medium"
+              >
+                តាមដានស្ថានភាព
+              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowAdminPanel(true)}
+                  className="text-gray-600 hover:text-green-600 font-medium"
+                >
+                  ផ្នែកគ្រប់គ្រង
+                </button>
+              )}
+              <a href="#" className="text-gray-600 hover:text-green-600 font-medium">អំពីយើងខ្ញុំ</a>
+            </nav>
+
+            {/* User Account and Cart */}
+            <div className="flex items-center space-x-4">
+              {currentUser ? (
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-700 hidden sm:block">សួស្តី, {currentUser.name}</span>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1 text-gray-600 hover:text-green-600 transition-colors"
+                  >
+                    <User className="h-6 w-6" />
+                    <span>ចេញ</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setShowLoginModal(true)}
+                    className="flex items-center space-x-1 text-gray-600 hover:text-green-600 transition-colors"
+                  >
+                    <User className="h-6 w-6" />
+                    <span>ចូល</span>
+                  </button>
+                  <button
+                    onClick={() => setShowRegisterModal(true)}
+                    className="hidden sm:block text-green-600 hover:text-green-700 font-medium"
+                  >
+                    ចុះឈ្មោះ
+                  </button>
+                </div>
+              )}
+              
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 text-gray-600 hover:text-green-600 transition-colors"
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
+
+              {/* Mobile menu button */}
+              <button
+                className="md:hidden p-2 text-gray-600"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          {isMenuOpen && (
+            <div className="md:hidden py-4 border-t border-gray-200">
+              <div className="pb-4 relative">
+                <input
+                  type="text"
+                  placeholder="ស្វែងរកផលិតផល..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+                <Search className="absolute left-3 top-2 h-5 w-5 text-gray-400" />
+              </div>
+              <nav className="flex flex-col space-y-4">
+                <a href="#" className="text-green-800 font-medium">ទំព័រដើម</a>
+                <a href="#" className="text-gray-600 hover:text-green-600 font-medium">ទិញឥវ៉ាន់</a>
+                <button
+                  onClick={() => setShowOrderTracking(true)}
+                  className="text-gray-600 hover:text-green-600 font-medium text-left"
+                >
+                  តាមដានស្ថានភាព
+                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => setShowAdminPanel(true)}
+                    className="text-gray-600 hover:text-green-600 font-medium text-left"
+                  >
+                    ផ្នែកគ្រប់គ្រង
+                  </button>
+                )}
+                <a href="#" className="text-gray-600 hover:text-green-600 font-medium">អំពីយើងខ្ញុំ</a>
+              </nav>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            លក់ផលិតផលគ្រប់មុខ LH Accessories
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 opacity-90">
+            ផលិតផលគុណភាពខ្ពស់ ដឹកជញ្ជូនដល់ទ្វារផ្ទះអ្នក
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="bg-white text-green-700 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+              ទិញឥវ៉ាន់ឥឡូវនេះ
+            </button>
+          </div>
+          <div className="mt-6">
+            {currentUser ? (
+              <button 
+                onClick={() => setShowOrderTracking(true)}
+                className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-green-700 transition-colors"
+              >
+                តាមដានស្ថានភាពឥវ៉ាន់របស់អ្នក
+              </button>
+            ) : (
+              <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 max-w-md mx-auto">
+                <p className="mb-3">ចូលគណនីដើម្បីតាមដានស្ថានភាពការកុម្ម៉ង់របស់អ្នក!</p>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <button 
+                    onClick={() => setShowLoginModal(true)}
+                    className="bg-white text-green-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                  >
+                    ចូលគណនី
+                  </button>
+                  <button 
+                    onClick={() => setShowRegisterModal(true)}
+                    className="border-2 border-white text-white px-4 py-2 rounded-lg font-medium hover:bg-white hover:text-green-700 transition-colors"
+                  >
+                    ចុះឈ្មោះ
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center p-6 bg-green-50 rounded-xl shadow-sm">
+              <Truck className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">ដឹកជញ្ជូនលឿន</h3>
+              <p className="text-gray-600">ដឹកជញ្ជូនដល់ទ្វារផ្ទះអ្នកក្នុងរយៈពេល 1-3 ថ្ងៃ</p>
+            </div>
+            <div className="text-center p-6 bg-emerald-50 rounded-xl shadow-sm">
+              <Leaf className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">គុណភាពធានា</h3>
+              <p className="text-gray-600">ផលិតផលគុណភាពខ្ពស់ ធានាភាពស្រស់</p>
+            </div>
+            <div className="text-center p-6 bg-teal-50 rounded-xl shadow-sm">
+              <Award className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">សេវាកម្មល្អ</h3>
+              <p className="text-gray-600">សេវាកម្មអតិថិជន 24/7 ដោយក្រុមការងារវិជ្ជាជីវៈ</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Category Filter */}
+      <section className="py-8 bg-emerald-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap gap-4 justify-center">
+            {categories.map(category => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`px-6 py-2 rounded-full font-medium transition-colors ${
+                  selectedCategory === category.id
+                    ? 'bg-green-600 text-white shadow-md'
+                    : 'bg-white text-gray-700 hover:bg-green-100 border border-gray-200'
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Products Grid */}
+      <section className="py-16">
+ 
