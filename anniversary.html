@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Anniversary</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fef2f8, #fce7f3, #fbcfe8);
+            min-height: 100vh;
+            color: #7e22ce;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, rgba(244, 67, 117, 0.2), rgba(147, 51, 234, 0.2));
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+        
+        .anniversary-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            margin-bottom: 24px;
+            font-weight: 600;
+            color: #ef4444;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .anniversary-badge i {
+            color: #ec4899;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin: 1rem 0;
+            color: #9d174d;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: #c026d3;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Countdown */
+        .countdown-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .countdown-title {
+            font-size: 2rem;
+            color: #9d174d;
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+        
+        .countdown-box {
+            display: inline-block;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px 40px;
+            min-width: 180px;
+            transition: transform 0.3s ease;
+        }
+        
+        .countdown-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #db2777;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .countdown-label {
+            color: #f472b6;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        /* Love Letter */
+        .love-letter {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+        }
+        
+        .love-letter-icon {
+            font-size: 3rem;
+            color: #ec4899;
+            margin-bottom: 20px;
+        }
+        
+        .love-letter-title {
+            font-size: 1.75rem;
+            color: #9d174d;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+        
+        .love-letter-content {
+            font-size: 1.1rem;
+            color: #4b5563;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .love-letter-content p {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .love-letter-signature {
+            font-weight: 700;
+            color: #c026d3;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        /* Photo Gallery - Removed as requested */
+        .photo-gallery-section {
+            margin: 40px 0;
+            display: none; /* Hidden as requested */
+        }
+        
+        /* Love Notes */
+        .love-notes {
+            background: linear-gradient(90deg, #f43f5e, #9333ea);
+            color: white;
+            border-radius: 24px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+        
+        .love-notes-title {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .love-notes-title i {
+            color: white;
+        }
+        
+        .love-notes-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .love-note-item {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        .love-note-item:nth-child(1) { animation-delay: 0.1s; }
+        .love-note-item:nth-child(2) { animation-delay: 0.2s; }
+        .love-note-item:nth-child(3) { animation-delay: 0.3s; }
+        .love-note-item:nth-child(4) { animation-delay: 0.4s; }
+        .love-note-item:nth-child(5) { animation-delay: 0.5s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Details */
+        .details-section {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            margin: 40px 0;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .detail-item h3 {
+            font-size: 1.25rem;
+            color: #9d174d;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-item h3 i {
+            color: #ec4899;
+        }
+        
+        .detail-item p {
+            color: #4b5563;
+            line-height: 1.8;
+        }
+        
+        .detail-item strong {
+            color: #7e22ce;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+        
+        .footer-hearts {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-hearts i {
+            color: #ef4444;
+            font-size: 1.5rem;
+        }
+        
+        .footer-title {
+            font-size: 1.75rem;
+            color: #9d174d;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        
+        .footer-quote {
+            color: #c026d3;
+            font-style: italic;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.25rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .countdown-box {
+                padding: 20px 30px;
+                min-width: 140px;
+            }
+            
+            .countdown-number {
+                font-size: 2.5rem;
+            }
+            
+            .love-letter, .love-notes, .details-section {
+                padding: 30px 20px;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .countdown-box {
+                padding: 15px 20px;
+                min-width: 120px;
+            }
+            
+            .countdown-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="anniversary-badge">
+                <i class="fas fa-heart"></i>
+                <span>122 Days Anniversary</span>
+            </div>
+            <h1>Happy Anniversary!</h1>
+            <p class="subtitle">យើងទាំងពីរអ្នក ❤️</p>
+        </header>
+
+        <!-- Anniversary Countdown -->
+        <section class="countdown-section">
+            <h2 class="countdown-title">122 ថ្ងៃនៃសេចក្តីស្រឡាញ់</h2>
+            <div class="countdown-box">
+                <div class="countdown-number">122</div>
+                <div class="countdown-label">ថ្ងៃ</div>
+            </div>
+        </section>
+
+        <!-- Love Letter -->
+        <section class="love-letter">
+            <div class="love-letter-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            <h3 class="love-letter-title">សំបុត្រស្នេហ៍ពីបង</h3>
+            <div class="love-letter-content">
+                <p>អូនសម្លាញ់,</p>
+                <p>បងស្រលាញ់អូនណាស់! តាំងពីយើងស្គាល់គ្នាដំបូង បងស្រលាញ់អូនតាំងទី 7 មក។ 
+                អូនជានារីម្នាក់ដែលតែងតែនៅក្បែរបង និងលើកទឹកចិត្តបងជានិច្ច។</p>
+                <p>អូនក៏ជានារីម្នាក់ដែលបងស្រលាញ់ខ្លាំង! សង្ឃឹមថាពួកយើងមាន memory ល្អជាមួយគ្នា រហូតណាអូនសម្លាញ់ 💗</p>
+                <p class="love-letter-signature">ស្រឡាញ់អូនជានិច្ច,<br>ពីបងដែលស្រលាញ់អូន</p>
+            </div>
+        </section>
+
+        <!-- Photo Gallery - REMOVED AS REQUESTED -->
+        <!-- The photo gallery section has been removed completely -->
+
+        <!-- Love Notes -->
+        <section class="love-notes">
+            <h3 class="love-notes-title">
+                <i class="fas fa-heart"></i>
+                ពាក្យពីបេះដូងបង
+            </h3>
+            <div class="love-notes-content">
+                <div class="love-note-item">អូនសម្លាញ់ជាអ្វីដែលបងស្រលាញ់ជាងគេក្នុងជីវិតនេះ 💗</div>
+                <div class="love-note-item">រាល់ថ្ងៃដែលមានអូននៅក្បែរ គឺជាថ្ងៃដ៏សុខសាន្តបំផុតសម្រាប់បង</div>
+                <div class="love-note-item">អូនជានារីដែលបងស្រលាញ់ខ្លាំង ហើយនឹងថែរក្សាអូនជានិច្ច</div>
+                <div class="love-note-item">តាំងពីថ្ងៃដែលយើងស្គាល់គ្នា បងដឹងថាអូនគឺជាមនុស្សសម្រាប់បង</div>
+                <div class="love-note-item">សង្ឃឹមថាយើងនឹងមាន memory ល្អជាមួយគ្នារហូតដល់ចុងបញ្ចប់នៃជីវិត</div>
+            </div>
+        </section>
+
+        <!-- Celebration Details -->
+        <section class="details-section">
+            <div class="details-grid">
+                <div class="detail-item">
+                    <h3><i class="fas fa-calendar"></i> Anniversary យើង</h3>
+                    <p><strong>ថ្ងៃគ្រប់គ្រង់:</strong> <span id="current-date">ថ្ងៃនេះ</span><br>
+                    <strong>ថ្ងៃសរសេរ:</strong> 122 ថ្ងៃ<br>
+                    <strong>អនាគត:</strong> រហូតដល់ចុងបញ្ចប់នៃជីវិត 💗</p>
+                </div>
+                <div class="detail-item">
+                    <h3><i class="fas fa-map-marker-alt"></i> ទីកន្លែងពិសេស</h3>
+                    <p><strong>ទីកន្លែងដែលយើងជួបគ្នា:</strong> ទីកន្លែងដ៏អស្ចារ្យបំផុតក្នុងជីវិតបង<br>
+                    <strong>ទីកន្លែងដែលយើងនឹងទៅ:</strong> គ្រប់ទីកន្លែងដែលមានអូន</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-hearts">
+                <i class="fas fa-heart"></i>
+                <span class="footer-title">ស្រលាញ់អូនជានិច្ច 💗</span>
+                <i class="fas fa-heart"></i>
+            </div>
+            <p class="footer-quote">"អូនសម្លាញ់ជាអ្វីដែលបងស្រលាញ់ជាងគេក្នុងជីវិតនេះ"</p>
+        </footer>
+    </div>
+
+    <script>
+        // បង្ហាញថ្ងៃបច្ចុប្បន្ន
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = now.toLocaleDateString('km-KH', options);
+    </script>
+</body>
+</html>
+
